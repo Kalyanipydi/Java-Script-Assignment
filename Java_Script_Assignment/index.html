@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+rect{
+fill:lightgreen;stroke-width:3;stroke:rgb(0,0,0);
+width: 150px;
+}
+svg{
+background-color:lightgrey;
+margin-top: 50px;
+margin-left:auto;
+margin-right:auto;
+display:block;
+padding-top: 70px;
+}
+h2 {
+
+  color: red;
+  font-weight: bold;
+  font-style: italic;
+}
+</style>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<u><h2 align=center >Fat,Protein and carbohydrates Consumption by Europe Regions</h2></u>
+</head>
+<body>
+<script >
+      var margin={top:20,right:10,bottom:100,left:100};
+
+    d3.json("graph2.json",function(data){
+      var width=1000-margin.right-margin.left;
+      var height=500-margin.top-margin.bottom;
+
+      var widthScale=d3.scale.linear()
+                      .domain([0,299954])
+                      .range([0,width]);
+      var color=d3.scale.linear()
+                          .domain([0,299954])
+                          .range(["lightgreen","blue"]);
+
+
+      var canvas=d3.select("body").append("svg")
+      .attr("width",width+margin.right+margin.left)
+      .attr("height",height+margin.top+margin.bottom)
+      .append("g")
+      .attr("transform","translate("+margin.left+','+margin.right+')');
+
+      var xScale=d3.scale.ordinal()
+                  .rangeRoundBands([0,width],0.2 ,0.2);
+      var yScale=d3.scale.linear()
+                  .range([height,0]);
+      var xAxis=d3.svg.axis()
+                  .scale(xScale)
+                  .orient("bottom");
+      var yAxis=d3.svg.axis()
+                .scale(yScale)
+                .orient("left");
+      xScale.domain(data.map(function(d){return d.cx;}));
+      yScale.domain([0,d3.max(data,function(d){return d.cy;})]);
+
+
+
+      canvas.selectAll("rect")
+          .data(data)
+          .enter()
+          .append("rect")
+          .attr({
+            "x":function(d){return xScale(d.cx);},
+            "y":function(d){return yScale(d.cy);},
+            "width":xScale.rangeBand(),
+            "height":function(d){return height-yScale(d.cy);}
+            //"color":function(d){return color(d.cy);}
+
+          });
+
+    
+      canvas.append("g")
+            .attr("class","x axis")
+            .attr("transform","translate(0,"+height+")")
+             .call(xAxis);
+      canvas.append("g")
+                  .attr("class","y axis")
+                  .attr("transform","translate(,0"+height+")")
+                  .call(yAxis);
+
+
+
+    });
+
+</script>
+</body>
+</html>
